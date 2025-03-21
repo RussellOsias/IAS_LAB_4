@@ -1,19 +1,23 @@
 import { auth } from "./firebase-config.js";
-import { createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-
-// Initialize Firestore
-const db = getFirestore();
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
 // DOM Elements
-const registerForm = document.getElementById('registerForm');
+const registerForm = document.getElementById("registerForm");
 
 // Register User
-registerForm.addEventListener('submit', (e) => {
+registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('reg-email').value;
-  const password = document.getElementById('reg-password').value;
+  const email = document.getElementById("reg-email").value;
+  const password = document.getElementById("reg-password").value;
+  const firstName = document.getElementById("reg-first-name").value;
+  const middleName = document.getElementById("reg-middle-name").value;
+  const lastName = document.getElementById("reg-last-name").value;
+  const phoneNumber = document.getElementById("reg-phone-number").value;
+  const address = document.getElementById("reg-address").value;
 
   console.log("Attempting to register with:", email, password);
 
@@ -27,8 +31,36 @@ registerForm.addEventListener('submit', (e) => {
       return sendEmailVerification(user);
     })
     .then(() => {
-      alert("Registration successful! Please check your email to verify your account.");
-      window.location.href = "index.html"; // Redirect to login page
+      // Send user data to PHP backend
+      fetch("register_user.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          middle_name: middleName,
+          last_name: lastName,
+          email: email,
+          password: password, // Password should be securely hashed in PHP
+          phone_number: phoneNumber,
+          address: address,
+          role: "resident", // Default role
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            alert("Registration successful! Please check your email to verify your account.");
+            window.location.href = "index.html"; // Redirect to login page
+          } else {
+            alert("Error saving user data: " + data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error sending data to server:", error);
+          alert("Error: Failed to save user data.");
+        });
     })
     .catch((error) => {
       console.error("Registration failed:", error);
