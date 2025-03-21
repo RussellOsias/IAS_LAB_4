@@ -11,8 +11,8 @@ import {
 const googleProvider = new GoogleAuthProvider();
 
 // DOM Elements
-const loginForm = document.getElementById('loginForm');
-const googleLoginButton = document.getElementById('googleLoginButton');
+const loginForm = document.getElementById("loginForm");
+const googleLoginButton = document.getElementById("googleLoginButton");
 
 // Handle Authentication State
 onAuthStateChanged(auth, (user) => {
@@ -23,7 +23,7 @@ onAuthStateChanged(auth, (user) => {
     if (user.emailVerified) {
       console.log("Email is verified. Redirecting to dashboard...");
       setTimeout(() => {
-        window.location.href = "dashboard.html";
+        window.location.href = "dashboard.php"; // Redirect to PHP-based dashboard
       }, 500); // 500ms delay
     } else {
       console.log("Email is not verified.");
@@ -39,11 +39,11 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Login User
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   console.log("Attempting to log in with:", email, password);
 
@@ -58,7 +58,7 @@ loginForm.addEventListener('submit', (e) => {
 });
 
 // Login with Google
-googleLoginButton.addEventListener('click', () => {
+googleLoginButton.addEventListener("click", () => {
   console.log("Attempting to log in with Google...");
 
   signInWithPopup(auth, googleProvider)
@@ -71,7 +71,7 @@ googleLoginButton.addEventListener('click', () => {
       if (user.emailVerified) {
         console.log("Email is verified. Redirecting to dashboard...");
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          window.location.href = "dashboard.php"; // Redirect to PHP-based dashboard
         }, 500); // 500ms delay
       } else {
         console.log("Email is not verified.");
