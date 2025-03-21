@@ -18,6 +18,7 @@ registerForm.addEventListener("submit", (e) => {
   const lastName = document.getElementById("reg-last-name").value;
   const phoneNumber = document.getElementById("reg-phone-number").value;
   const address = document.getElementById("reg-address").value;
+  const profilePicture = document.getElementById("reg-profile-picture").files[0]; // Profile picture file
 
   console.log("Attempting to register with:", email, password);
 
@@ -32,35 +33,30 @@ registerForm.addEventListener("submit", (e) => {
     })
     .then(() => {
       // Send user data to PHP backend
-      fetch("register_user.php", {
+      const formData = new FormData();
+      formData.append("first_name", firstName);
+      formData.append("middle_name", middleName);
+      formData.append("last_name", lastName);
+      formData.append("email", email);
+      formData.append("password", password); // Password should be securely hashed in PHP
+      formData.append("phone_number", phoneNumber);
+      formData.append("address", address);
+      formData.append("role", "resident"); // Default role
+      formData.append("profile_picture", profilePicture); // Profile picture file
+
+      return fetch("register_user.php", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          first_name: firstName,
-          middle_name: middleName,
-          last_name: lastName,
-          email: email,
-          password: password, // Password should be securely hashed in PHP
-          phone_number: phoneNumber,
-          address: address,
-          role: "resident", // Default role
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status === "success") {
-            alert("Registration successful! Please check your email to verify your account.");
-            window.location.href = "index.html"; // Redirect to login page
-          } else {
-            alert("Error saving user data: " + data.message);
-          }
-        })
-        .catch((error) => {
-          console.error("Error sending data to server:", error);
-          alert("Error: Failed to save user data.");
-        });
+        body: formData,
+      });
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status === "success") {
+        alert("Registration successful! Please check your email to verify your account.");
+        window.location.href = "index.html"; // Redirect to login page
+      } else {
+        alert("Error saving user data: " + data.message);
+      }
     })
     .catch((error) => {
       console.error("Registration failed:", error);
